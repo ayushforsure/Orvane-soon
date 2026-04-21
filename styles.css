@@ -689,10 +689,18 @@ nav.scrolled {
   margin-bottom: 2.8rem;
 }
 
+/* Form: name stacks above the email + button row */
 .email-form {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-bottom: 1.5rem;
+}
+
+/* Inner row: email input + submit button side by side */
+.input-row {
+  display: flex;
+  gap: 10px;
 }
 
 .email-input {
@@ -817,9 +825,19 @@ footer {
 .footer-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
+}
+
+/* Three equal columns so copyright is always perfectly centred */
+.footer-brand,
+.footer-copy,
+.footer-links {
+  flex: 1;
+}
+
+.footer-copy {
+  text-align: center;
 }
 
 .footer-brand {
@@ -829,12 +847,14 @@ footer {
   text-decoration: none;
 }
 
+/* font-size and colors now defined above in the combined rule */
 .footer-copy { font-size: 0.8rem; color: var(--ink-3); }
 
 .footer-links {
   display: flex;
   gap: 1.4rem;
   align-items: center;
+  justify-content: flex-end;  /* push icons to the right */
 }
 
 .footer-links a {
@@ -874,8 +894,11 @@ footer {
 
 @media (max-width: 640px) {
   .stat-grid    { grid-template-columns: 1fr; }
-  .email-form   { flex-direction: column; }
+  .input-row    { flex-direction: column; }
   .footer-inner { flex-direction: column; gap: 1.2rem; text-align: center; }
-  .nav-cta      { display: none; }
+  .footer-brand,
+  .footer-copy,
+  .footer-links { flex: unset; width: 100%; justify-content: center; }
   .footer-links { justify-content: center; }
+  .nav-cta      { display: none; }
 }
