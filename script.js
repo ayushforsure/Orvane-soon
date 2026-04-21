@@ -126,56 +126,56 @@
 
   /* ═══════════════════════════════════════════════════════
      5.  WAITLIST FORM — POSTs to /api/waitlist (Supabase)
+         Captures: email, name, source (from URL ?source=)
   ═══════════════════════════════════════════════════════ */
-  const form   = document.getElementById('wl-form');
-  const btn    = document.getElementById('wl-btn');
-  const inp    = document.getElementById('wl-email');
-  const msgEl  = document.getElementById('form-message');
+  const form      = document.getElementById('wl-form');
+  const btn       = document.getElementById('wl-btn');
+  const nameInput = document.getElementById('wl-name');
+  const inp       = document.getElementById('wl-email');
+  const msgEl     = document.getElementById('form-message');
+
+  // Detect traffic source from URL (?source=twitter, etc.)
+  const source = new URLSearchParams(window.location.search).get('source') || 'website';
 
   // ── Helpers ────────────────────────────────────────────
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   function showMessage(text, type) {
-    msgEl.textContent    = text;
-    msgEl.className      = 'form-message ' + type;  // 'success' | 'error'
-    msgEl.style.display  = 'block';
-
-    // Smooth fade-in via opacity transition defined in CSS
-    requestAnimationFrame(function () {
-      msgEl.style.opacity = '1';
-    });
+    msgEl.textContent   = text;
+    msgEl.className     = 'form-message ' + type;
+    msgEl.style.display = 'block';
+    requestAnimationFrame(function () { msgEl.style.opacity = '1'; });
   }
 
   function clearMessage() {
-    msgEl.style.opacity  = '0';
-    msgEl.style.display  = 'none';
-    msgEl.className      = 'form-message';
-    msgEl.textContent    = '';
+    msgEl.style.opacity = '0';
+    msgEl.style.display = 'none';
+    msgEl.className     = 'form-message';
+    msgEl.textContent   = '';
   }
 
   function setLoading(loading) {
     btn.disabled = loading;
-    if (loading) {
-      btn.classList.add('loading');
-      btn.dataset.original = btn.textContent;
-    } else {
-      btn.classList.remove('loading');
-    }
+    if (loading) { btn.classList.add('loading'); }
+    else         { btn.classList.remove('loading'); }
   }
 
   function setSuccess() {
-    btn.textContent       = '✓ You\'re in';
-    btn.style.background  = '#5A8A60';
-    btn.style.color       = '#fff';
-    btn.disabled          = true;
-    inp.value             = '';
-    inp.disabled          = true;
+    btn.textContent      = '✓ You\'re in';
+    btn.style.background = '#5A8A60';
+    btn.style.color      = '#fff';
+    btn.disabled         = true;
+    nameInput.value      = '';
+    inp.value            = '';
+    nameInput.disabled   = true;
+    inp.disabled         = true;
   }
 
   // ── Client-side validation ─────────────────────────────
-  function validateEmail(value) {
-    if (!value) return 'Please enter your email address.';
-    if (!EMAIL_RE.test(value)) return 'Please enter a valid email address.';
+  function validateInputs(name, email) {
+    if (!name)                  return 'Please enter your name.';
+    if (!email)                 return 'Please enter your email address.';
+    if (!EMAIL_RE.test(email))  return 'Please enter a valid email address.';
     return null;
   }
 
@@ -185,12 +185,13 @@
       e.preventDefault();
       clearMessage();
 
+      var name  = nameInput.value.trim();
       var email = inp.value.trim();
-      var validationError = validateEmail(email);
+      var err   = validateInputs(name, email);
 
-      if (validationError) {
-        showMessage(validationError, 'error');
-        inp.focus();
+      if (err) {
+        showMessage(err, 'error');
+        (name ? inp : nameInput).focus();
         return;
       }
 
@@ -199,7 +200,7 @@
       fetch('/api/waitlist', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ email: email }),
+        body:    JSON.stringify({ email: email, name: name, source: source }),
       })
         .then(function (res) {
           return res.json().then(function (data) {
@@ -208,7 +209,6 @@
         })
         .then(function (result) {
           setLoading(false);
-
           if (result.status === 200 || result.status === 201) {
             setSuccess();
             showMessage(result.data.message || "You're on the list!", 'success');
@@ -222,11 +222,12 @@
         });
     });
 
-    // Live clear error on input so it feels responsive
-    inp.addEventListener('input', function () {
-      if (msgEl.classList.contains('error')) {
-        clearMessage();
-      }
+    // Live-clear error message while user types
+    [nameInput, inp].forEach(function (el) {
+      el.addEventListener('input', function () {
+        if (msgEl.classList.contains('error')) clearMessage();
+      });
     });
   }
 })();
+

@@ -52,8 +52,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed.' });
   }
 
-  // Parse + validate email
-  const { email } = req.body || {};
+  // Parse + validate
+  const { email, name, source } = req.body || {};
 
   if (!email || typeof email !== 'string') {
     return res.status(400).json({ error: 'Email is required.' });
@@ -68,7 +68,11 @@ module.exports = async function handler(req, res) {
   // Insert into Supabase
   const { error } = await supabase
     .from('waitlist')
-    .insert([{ email: trimmed }]);
+    .insert([{
+      email:      trimmed,
+      name:       (typeof name === 'string' && name.trim()) || null,
+      source:     (typeof source === 'string' && source.trim()) || 'website',
+    }]);
 
   if (error) {
     // Postgres unique_violation code = '23505'
