@@ -21,7 +21,7 @@
  */
 
 const { createClient } = require('@supabase/supabase-js');
-const { Resend }       = require('resend');
+const { Resend } = require('resend');
 
 // ── Supabase client (initialised once per cold start) ────────
 const supabase = createClient(
@@ -76,9 +76,9 @@ module.exports = async function handler(req, res) {
   const { error } = await supabase
     .from('waitlist')
     .insert([{
-      email:      trimmed,
-      name:       (typeof name === 'string' && name.trim()) || null,
-      source:     (typeof source === 'string' && source.trim()) || 'website',
+      email: trimmed,
+      name: (typeof name === 'string' && name.trim()) || null,
+      source: (typeof source === 'string' && source.trim()) || 'website',
     }]);
 
   if (error) {
@@ -101,40 +101,83 @@ module.exports = async function handler(req, res) {
 
   try {
     await resend.emails.send({
-      from:    'Orvane <onboarding@resend.dev>',
-      to:      trimmed,
-      subject: "You're in — Orvane Early Access",
+      from: 'Orvane <team@orvane.in>',
+      to: trimmed,
+      subject: "You’re in. And that actually matters.",
       html: `
-        <div style="font-family: 'Georgia', serif; max-width: 560px; margin: 0 auto; padding: 40px 24px; color: #1A1815; background: #F5F0E8;">
+        <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; background:#f5f1ea; padding:48px; color:#111; max-width:600px; margin:auto; line-height:1.7;">
 
-          <p style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 2px; color: #B89A6A; margin-bottom: 8px;">Orvane</p>
+      <h2 style="margin-bottom:20px;">You’re in. And that actually matters.</h2>
 
-          <h1 style="font-size: 2rem; font-weight: 400; line-height: 1.15; margin: 0 0 24px;">
-            Welcome, ${firstName}.
-          </h1>
+      <p>Hey,</p>
 
-          <p style="font-size: 1rem; line-height: 1.75; color: #3D3A34; margin-bottom: 16px;">
-            You're officially on the early access list.
-          </p>
+      <p>
+        I don’t know what made you stop today —<br/>
+        but I’m glad you did.
+      </p>
 
-          <p style="font-size: 1rem; line-height: 1.75; color: #3D3A34; margin-bottom: 16px;">
-            We're building something powerful — turning raw market news into structured,
-            actionable intelligence. You'll be among the first to experience it.
-          </p>
+      <p>
+        And genuinely, thank you for it.
+      </p>
 
-          <p style="font-size: 1rem; line-height: 1.75; color: #3D3A34; margin-bottom: 32px;">
-            We'll reach out when your access is ready. No spam, no noise — just signal.
-          </p>
+      <br/>
 
-          <div style="border-top: 1px solid #D8D2C6; padding-top: 24px; font-size: 0.85rem; color: #7A756B;">
-            — Team Orvane
-          </div>
-        </div>
+      <p>
+        Most people scroll past things that matter.
+      </p>
+
+      <p>
+        You didn’t.
+      </p>
+
+      <br/>
+
+      <p>
+        So this isn’t just another signup.
+      </p>
+
+      <p>
+        <strong>You’re early.</strong><br/>
+        And that’s not something we take lightly.
+      </p>
+
+      <br/>
+
+      <p>
+        We’re building this quietly.<br/>
+        No rush. No noise. Just doing it right.
+      </p>
+
+      <p>
+        When it’s ready — you’ll be among the first to see it.
+      </p>
+
+      <br/>
+
+      <p>
+        Until then,<br/>
+        stay a little more curious than everyone else.
+      </p>
+
+      <br/>
+
+      <p>— Team Orvane</p>
+
+      <br/>
+
+      <p style="font-size:13px; color:#555;">
+        P.S. If something about the way people consume information has ever felt “off”…<br/>
+        you’re not imagining it.
+      </p>
+
+    </div>
       `,
     });
-  } catch (emailError) {
-    // Log internally but do NOT surface to the user
-    console.error('[resend] Welcome email failed:', emailError.message);
+
+    console.log('[resend] Welcome email sent to:', trimmed);
+
+  } catch (err) {
+    console.error('[resend] Email send failed:', err);
   }
 
   return res.status(201).json({
