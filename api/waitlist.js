@@ -107,7 +107,7 @@ module.exports = async function handler(req, res) {
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; background:#f5f1ea; padding:48px; color:#111; max-width:600px; margin:auto; line-height:1.7;">
 
-      <h2 style="margin-bottom:20px;">You’re in. And that actually matters.</h2>
+      <h2 style="margin-bottom:20px;">You matter to us!!</h2>
 
       <p>Hey ${firstName},</p>
 
