@@ -109,7 +109,7 @@ module.exports = async function handler(req, res) {
 
       <h2 style="margin-bottom:20px;">You’re in. And that actually matters.</h2>
 
-      <p>Hey,</p>
+      <p>Hey ${firstName},</p>
 
       <p>
         I don’t know what made you stop today —<br/>
